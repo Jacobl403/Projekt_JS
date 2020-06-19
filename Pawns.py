@@ -6,6 +6,8 @@ class pawn(object):
         self.x = x
         self.y = y
         self.type_piece = type_piece
+        self.center=0
+
 
     def list_of_moves(self):
         move_list=[]
@@ -25,6 +27,9 @@ class pawn(object):
             jump_list.append((self.x-2,self.y+2))
             jump_list.append((self.x-2,self.y-2))
         return jump_list
+
+    def __repr__(self):
+        return str(self.type_piece)
 
 
 class Quin(pawn):
