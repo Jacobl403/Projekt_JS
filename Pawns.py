@@ -7,8 +7,6 @@ class pawn(object):
         self.y = y
         self.type_piece = type_piece
 
-
-
     def list_of_moves(self):
         move_list=[]
 
@@ -60,16 +58,14 @@ class Quin(pawn):
 
     def list_of_jumps(self):
         jump_list=[]
-        jump_list.append((self.x + 2, self.y + 2))
-        jump_list.append((self.x + 2, self.y - 2))
-        jump_list.append((self.x - 2, self.y + 2))
-        jump_list.append((self.x - 2, self.y - 2))
+        jump_list.append((self.x + 2, self.y + 2,self.x+1,self.y+1))
+        jump_list.append((self.x + 2, self.y - 2,self.x+1,self.y-1))
+        jump_list.append((self.x - 2, self.y + 2,self.x-1,self.y+1))
+        jump_list.append((self.x - 2, self.y - 2,self.x-1,self.y-1))
         for move in jump_list:
             if move[0]<0 or move[0]>7 or move[1]<0 or move[1]>7:
                 jump_list.remove(move)
 
         return jump_list
 
-p=pawn(1,2,"B")
-print(p)
 

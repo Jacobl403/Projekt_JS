@@ -50,14 +50,13 @@ def DisplayBoard(screen, grid):
                 pawn_display(screen, str(grid.board[column][row]), block.center)
 
 
-#todo: ogarnac graczy
-#todo: tura gracza + dodaj napis kogo tura
-#todo: zamiana w krolowa
+
+#todo:  dodaj napis kogo tura
 #todo: dodanie zmiany nazwy pionka
 #todo: oczyszczenie kodu
 
 #todo: dodac wyjatki
-#todo nwm co z gui zrobic
+
 #todo: dodac przycisk resetu
 #todo: testy
 #todo: podpisac w gitchabie
@@ -79,19 +78,20 @@ def main():
         else:
             current_player =Player2
         screen.fill((0, 0, 0))
-        print(current_player)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                return 0
+            # Wybieramy pionka nastepnie sprawdzamy czy nalezy do klasy pawn
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     old_x, old_y = pygame.mouse.get_pos()
                     old_x = (old_x - 15) // 60
                     old_y = (old_y - 35) // 60
-                    ######################################
-                    if (isinstance(grid.board[old_y][old_x], pawn)and current_player.itismypawn(grid.board,old_y,old_x)):
+
+                    if (isinstance(grid.board[old_y][old_x], pawn)and current_player.Check_pawn(grid.board, old_y, old_x)):
                         second_click = True
                         count_moves=0
+                        #wybranym pionkiem sprawdzamy mozliwy ruch
                         while second_click:
                             event = pygame.event.wait()
                             if event.type == pygame.QUIT:
@@ -102,34 +102,41 @@ def main():
                                     x, y = pygame.mouse.get_pos()
                                     x = (x - 15) // 60
                                     y = (y - 35) // 60
-                                    print('lista ruchow {}'.format(grid.board[old_y][old_x].list_of_moves()))
-                                    if grid.ismovepossible(grid.board[old_y][old_x], y, x) and count_moves==0 :
+
+                                    if grid.Check_move(grid.board[old_y][old_x], y, x) and count_moves==0 :
                                         grid.move(grid.board[old_y][old_x], y, x)
-                                        print('ruch poprawny {} {}'.format(y,x))
+                                        print('ruch poprawny')
                                         count_moves+=1
                                         second_click = False
-                                    elif grid.isjumppossible(grid.board[old_y][old_x], y, x):
+
+                                    elif grid.beating(grid.board[old_y][old_x], y, x):
                                         grid.move(grid.board[old_y][old_x], y, x)
-                                        print('ruch poprawny {} {}'.format(y,x))
+                                        print('ruch poprawny')
                                         old_y=y
                                         old_x=x
                                         count_moves += 1
+                                        if current_player.player=="Player 1":
+                                            Player2.number_of_pawns-=1
+                                        elif current_player.player=="Player 2":
+                                            Player1.number_of_pawns -= 1
 
                                     else:
                                         print('ruch niemozliwy')
                                         second_click = False
+
+                            grid.makeQuin()
                             DisplayBoard(screen, grid)
                             pygame.display.update()
 
                         if count_moves>0:
-                            Player1.endmyturn(Player1.Turn)
-                            Player2.endmyturn(Player2.Turn)
+                            Player1.Turn_end(Player1.Turn)
+                            Player2.Turn_end(Player2.Turn)
 
 
-        running=Player1.isgameover()
-        running=Player2.isgameover()
         DisplayBoard(screen, grid)
         pygame.display.update()
+        running=Player1.Game_Over()
+        running=Player2.Game_Over()
 
 
 if __name__ == "__main__":
