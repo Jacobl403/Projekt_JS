@@ -45,19 +45,27 @@ class Game_Logic(object):
 
     def Check_move(self, pawn, x, y):
         for move in pawn.list_of_moves():
-            print(x, y)
             if move[0] == x and move[1] == y and self.board[x][y] == ' ':
                 return True
         return False
 
-    def beating(self, pawn, x, y):
-        for jump in pawn.list_of_jumps():
+    def beating(self, pawn, x=-1, y=-1):
+        #mozliwe ruchy bez podania wspólrzednych myszką
 
+        for jump in pawn.list_of_jumps():
             if jump[0] == x and jump[1] == y and self.board[x][y] == ' ' and self.board[jump[2]][jump[3]] != ' ' and \
                     self.board[jump[2]][jump[3]].type_piece != pawn.type_piece:
                 self.board[jump[2]][jump[3]] = ' '
                 return True
         return False
+
+    def cant_beat(self, pawn):
+        for posible_jump in pawn.list_of_jumps():
+            if self.board[posible_jump[0]][posible_jump[1]] == ' ' and self.board[posible_jump[2]][
+                posible_jump[3]] != ' ' and self.board[posible_jump[2]][posible_jump[3]].type_piece != pawn.type_piece:
+                return False
+        return True
+
 
     def move(self, pawn, x, y):
         self.board[pawn.x][pawn.y] = ' '
@@ -65,18 +73,21 @@ class Game_Logic(object):
         pawn.y = y
         self.board[pawn.x][pawn.y] = pawn
 
-    def makeQuin(self):
+    def makeQuin(self,player1,player2):
         for y in range(8):
             if(isinstance(self.board[7][y],Pawns.pawn)and self.board[7][y].type_piece=='B'):
+                player2.list_Pawns.remove(self.board[7][y])
                 self.board[7][y]=' '
                 createQuin = Pawns.Quin(7, y, 'Bd')
                 self.board[7][y] = createQuin
+                player2.list_Pawns.append(self.board[7][y])
 
             if (isinstance(self.board[0][y], Pawns.pawn) and self.board[0][y].type_piece == 'C'):
+                player1.list_Pawns.remove(self.board[0][y])
                 self.board[0][y] = ' '
                 createQuin = Pawns.Quin(0, y, 'Cd')
                 self.board[0][y] =createQuin
-
+                player1.list_Pawns.append(self.board[0][y])
 
 
 class Player(object):
@@ -99,12 +110,5 @@ class Player(object):
         print('pionek przeciwnika')
         return False
 
-    def Game_Over(self):
-        if self.number_of_pawns == 0:
-            return False
-        else:
-            return True
-    def check_numb_pawn(self, list_Pawns):
-        self.number_of_pawns = len(list_Pawns)
     def __str__(self):
         return ' {}'.format(self.player)

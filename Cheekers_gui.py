@@ -1,15 +1,16 @@
 import pygame
 from os import environ
-import Game_Logic
+from  Game_Logic import *
 from Pawns import *
 class Checkers_gui(object):
     def __init__(self):
         self.screen=self.init_screen()
-        self.grid=Game_Logic.Game_Logic()
+        self.grid=Game_Logic()
         self.running = True
-        self.Player1 = Game_Logic.Player("Player 1", self.grid.player_red)
-        self.Player2 = Game_Logic.Player("Player 2", self.grid.player_black)
+        self.Player1 = Player("Player 1", self.grid.player_red)
+        self.Player2 = Player("Player 2", self.grid.player_black)
         self.Player1.Turn = True
+        self.clock=pygame.time.Clock()
 
     def init_screen(self):
         Window_x = 300
@@ -22,13 +23,30 @@ class Checkers_gui(object):
         pygame.display.set_icon(icon)
         return screen
 
-    def DisplayBoard(self):
+    def turn_drawn(self,msg):
+        color = (69, 252, 3)
+        font = pygame.font.Font(None, 50)
+        text = font.render(f"Tura gracza : {msg}", True, color)
+        return text
+
+    def res_Button(self):
+        color2 = (233, 252, 211)
+        color = (69, 252, 3)
+        pygame.draw.rect(self.screen, color, (500, 150, 80, 80))
+        font = pygame.font.Font(None, 30)
+        text = font.render("RESET", True, color2)
+        self.screen.blit(text, (510, 180))
+
+    def DisplayBoard(self, current_player):
         black = (0, 0, 0)
         white = (255, 255, 255)
         wood = (166, 128, 100)
         x, y = 15, 35
         size = 60
         self.screen.fill(wood)
+        text = self.turn_drawn(current_player.player)
+        self.screen.blit(text, (100, 1))
+        self.res_Button()
         for row in range(8):
             for column in range(8):
                 if (row % 2 == 0 and column % 2 == 0) or (row % 2 != 0 and column % 2 != 0):
@@ -55,68 +73,94 @@ class Checkers_gui(object):
 
     def mainloop(self):
         while self.running:
-            if self.Player1.Turn == True:
-                current_player = self.Player1
-            else:
-                current_player = self.Player2
-            self.screen.fill((0, 0, 0))
-            print(self.Player1.number_of_pawns)
-            print(self.Player2.number_of_pawns)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    return 0
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    if event.button == 1:
-                        old_x, old_y = pygame.mouse.get_pos()
-                        old_x = (old_x - 15) // 60
-                        old_y = (old_y - 35) // 60
-                        ######################################
-                        if (isinstance(self.grid.board[old_y][old_x], pawn) and current_player.Check_pawn(self.grid.board, old_y,
-                                                                                                     old_x)):
-                            second_click = True
-                            count_moves = 0
-                            while second_click:
-                                event = pygame.event.wait()
-                                if event.type == pygame.QUIT:
-                                    second_click = False
-                                    running = False
-                                elif event.type == pygame.MOUSEBUTTONUP:
-                                    if event.button == 1:
-                                        x, y = pygame.mouse.get_pos()
-                                        x = (x - 15) // 60
-                                        y = (y - 35) // 60
+            try:
+                if self.Player1.Turn:
+                    current_player = self.Player1
+                else:
+                    current_player = self.Player2
 
-                                        if self.grid.Check_move(self.grid.board[old_y][old_x], y, x) and count_moves == 0:
-                                            self.grid.move(self.grid.board[old_y][old_x], y, x)
-                                            print('ruch poprawny')
-                                            count_moves += 1
-                                            second_click = False
+                self.screen.fill((0, 0, 0))
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        return 0
+                    # Wybieramy pionka nastepnie sprawdzamy czy nalezy do klasy pawn
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        if event.button == 1:
+                            old_x, old_y = pygame.mouse.get_pos()
+                            if 500 <= old_x <= 580 and 150 <= old_y <= 230:
+                                self.__init__()
+                                self.mainloop()
+                                return
+                            old_x = (old_x - 15) // 60
+                            old_y = (old_y - 35) // 60
 
-                                        elif self.grid.beating(self.grid.board[old_y][old_x], y, x):
-                                            self.grid.move(self.grid.board[old_y][old_x], y, x)
-                                            print('ruch poprawny')
-                                            old_y = y
-                                            old_x = x
-                                            count_moves += 1
-                                            if current_player.player == "Player 1":
-                                                self.Player2.number_of_pawns -= 1
-                                            elif current_player.player == "Player 2":
-                                                self.Player1.number_of_pawns -= 1
+                            if isinstance(self.grid.board[old_y][old_x], pawn) and current_player.Check_pawn(self.grid.board,old_y, old_x):
+                                second_click = True
+                                count_moves = 0
+                                # wybranym pionkiem sprawdzamy mozliwy ruch
 
-                                        else:
-                                            print('ruch niemozliwy')
-                                            second_click = False
+                                while second_click:
+                                    event = pygame.event.wait()
 
-                                self.grid.makeQuin()
-                                self.DisplayBoard()
-                                pygame.display.update()
+                                    if event.type == pygame.QUIT:
+                                        second_click = False
+                                        running = False
+                                    elif event.type == pygame.MOUSEBUTTONUP:
+                                        if event.button == 1:
+                                            x, y = pygame.mouse.get_pos()
+                                            if 500 <= x <= 580 and 150 <= y <= 230:
+                                                print(x,y)
+                                                self.__init__()
+                                                self.mainloop()
+                                                return
+                                            x = (x - 15) // 60
+                                            y = (y - 35) // 60
 
-                            if count_moves > 0:
-                                self.Player1.Turn_end(self.Player1.Turn)
-                                self.Player2.Turn_end(self.Player2.Turn)
+                                            if self.grid.Check_move(self.grid.board[old_y][old_x], y, x) and count_moves == 0:
+                                                self.grid.move(self.grid.board[old_y][old_x], y, x)
 
-            self.DisplayBoard()
-            pygame.display.update()
-            self.running = self.Player1.Game_Over()
-            self.running = self.Player2.Game_Over()
+                                                count_moves += 1
+                                                second_click = False
 
+                                            elif self.grid.beating(self.grid.board[old_y][old_x], y, x):
+                                                self.grid.move(self.grid.board[old_y][old_x], y, x)
+                                                old_y = y
+                                                old_x = x
+                                                count_moves += 1
+
+                                                if current_player.player == "Player 1":
+                                                    self.Player2.number_of_pawns -= 1
+                                                elif current_player.player == "Player 2":
+                                                    self.Player1.number_of_pawns -= 1
+
+                                                if self.grid.cant_beat(self.grid.board[old_y][old_x]):
+                                                    second_click = False
+
+
+                                            else:
+                                                print('ruch niedozwolony')
+                                                second_click = False
+
+                                    self.grid.makeQuin(self.Player1,self.Player2)
+                                    self.DisplayBoard(current_player)
+                                    pygame.display.update()
+
+                                if count_moves > 0:
+                                    self.Player1.Turn_end(self.Player1.Turn)
+                                    self.Player2.Turn_end(self.Player2.Turn)
+
+                self.DisplayBoard(current_player)
+                pygame.display.update()
+                self.clock.tick(60)
+
+                if self.Player2.number_of_pawns == 0:
+                    print('wygrał Player1')
+                    self.running = False
+                if self.Player1.number_of_pawns == 0:
+                    print('wygrał Player2')
+                    self.running = False
+            except Exception as e:
+                continue
+
+p=Checkers_gui()
+p.mainloop()
