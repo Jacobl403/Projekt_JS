@@ -1,21 +1,19 @@
 import pygame
-from os import environ
-from  Game_Logic import *
+from Game_Logic import *
 from Pawns import *
+
+
 class Checkers_gui(object):
     def __init__(self):
-        self.screen=self.init_screen()
-        self.grid=Game_Logic()
+        self.screen = self.init_screen()
+        self.grid = Game_Logic()
         self.running = True
         self.Player1 = Player("Player 1", self.grid.player_red)
-        self.Player2 = Player("Player 2", self.grid.player_black)
+        self.Player2 = Player("Player 2", self.grid.player_yellow)
         self.Player1.Turn = True
-        self.clock=pygame.time.Clock()
+        self.clock = pygame.time.Clock()
 
     def init_screen(self):
-        Window_x = 300
-        Window_y = 100
-        environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (Window_x, Window_y)
         pygame.init()
         pygame.display.set_caption("English Checkers")
         screen = pygame.display.set_mode((600, 540))
@@ -23,7 +21,7 @@ class Checkers_gui(object):
         pygame.display.set_icon(icon)
         return screen
 
-    def turn_drawn(self,msg):
+    def turn_drawn(self, msg):
         color = (69, 252, 3)
         font = pygame.font.Font(None, 50)
         text = font.render(f"Tura gracza : {msg}", True, color)
@@ -57,18 +55,18 @@ class Checkers_gui(object):
 
     def pawn_display(self, pawn, center):
         red = (255, 0, 0)
-        color_p = (255, 223, 24)
+        yellow = (255, 223, 24)
         white = (255, 255, 255)
 
         if pawn == 'C' or pawn == '[C]':
             pygame.draw.circle(self.screen, red, center, 25)
         elif pawn == 'B' or pawn == '[B]':
-            pygame.draw.circle(self.screen, color_p, center, 25)
+            pygame.draw.circle(self.screen, yellow, center, 25)
         elif pawn == 'Cd' or pawn == '[Cd]':
             pygame.draw.circle(self.screen, red, center, 25)
             pygame.draw.circle(self.screen, white, center, 27, 1)
         elif pawn == 'Bd' or pawn == '[Bd]':
-            pygame.draw.circle(self.screen, color_p, center, 25)
+            pygame.draw.circle(self.screen, yellow, center, 25)
             pygame.draw.circle(self.screen, white, center, 28, 1)
 
     def mainloop(self):
@@ -94,10 +92,12 @@ class Checkers_gui(object):
                             old_x = (old_x - 15) // 60
                             old_y = (old_y - 35) // 60
 
-                            if isinstance(self.grid.board[old_y][old_x], pawn) and current_player.Check_pawn(self.grid.board,old_y, old_x):
+
+                            #ruch po wybraniu pionka
+
+                            if isinstance(self.grid.board[old_y][old_x], pawn) and current_player.Check_pawn(self.grid.board, old_y, old_x):
                                 second_click = True
                                 count_moves = 0
-                                # wybranym pionkiem sprawdzamy mozliwy ruch
 
                                 while second_click:
                                     event = pygame.event.wait()
@@ -109,7 +109,6 @@ class Checkers_gui(object):
                                         if event.button == 1:
                                             x, y = pygame.mouse.get_pos()
                                             if 500 <= x <= 580 and 150 <= y <= 230:
-                                                print(x,y)
                                                 self.__init__()
                                                 self.mainloop()
                                                 return
@@ -118,11 +117,11 @@ class Checkers_gui(object):
 
                                             if self.grid.Check_move(self.grid.board[old_y][old_x], y, x) and count_moves == 0:
                                                 self.grid.move(self.grid.board[old_y][old_x], y, x)
-
                                                 count_moves += 1
                                                 second_click = False
 
                                             elif self.grid.beating(self.grid.board[old_y][old_x], y, x):
+
                                                 self.grid.move(self.grid.board[old_y][old_x], y, x)
                                                 old_y = y
                                                 old_x = x
@@ -136,12 +135,11 @@ class Checkers_gui(object):
                                                 if self.grid.cant_beat(self.grid.board[old_y][old_x]):
                                                     second_click = False
 
-
                                             else:
                                                 print('ruch niedozwolony')
                                                 second_click = False
 
-                                    self.grid.makeQuin(self.Player1,self.Player2)
+                                    self.grid.makeQuin(self.Player1, self.Player2)
                                     self.DisplayBoard(current_player)
                                     pygame.display.update()
 
@@ -162,5 +160,7 @@ class Checkers_gui(object):
             except Exception as e:
                 continue
 
-p=Checkers_gui()
-p.mainloop()
+
+if __name__ == "__main__":
+    game = Checkers_gui()
+    game.mainloop()
