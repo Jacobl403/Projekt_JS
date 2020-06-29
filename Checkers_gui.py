@@ -1,15 +1,15 @@
 import pygame
-from Game_Logic import *
+import Game_Logic
 from Pawns import *
 
 
 class Checkers_gui(object):
     def __init__(self):
         self.screen = self.init_screen()
-        self.grid = Game_Logic()
+        self.grid = Game_Logic.Game_Logic()
         self.running = True
-        self.Player1 = Player("Player 1", self.grid.player_red)
-        self.Player2 = Player("Player 2", self.grid.player_yellow)
+        self.Player1 = Game_Logic.Player("Player 1", self.grid.player_red)
+        self.Player2 =Game_Logic.Player("Player 2", self.grid.player_yellow)
         self.Player1.Turn = True
         self.clock = pygame.time.Clock()
 
@@ -36,21 +36,21 @@ class Checkers_gui(object):
         self.screen.blit(text, (510, 180))
 
     def DisplayBoard(self, current_player):
-        BLACK = (0, 0, 0)
-        WHITE = (255, 255, 255)
-        WOOD = (166, 128, 100)
+        black = (0, 0, 0)
+        white = (255, 255, 255)
+        wood = (166, 128, 100)
         x, y = 15, 35
         size = 60
-        self.screen.fill(WOOD)
+        self.screen.fill(wood)
         text = self.turn_drawn(current_player.player)
         self.screen.blit(text, (100, 1))
         self.res_Button()
         for row in range(8):
             for column in range(8):
                 if (row % 2 == 0 and column % 2 == 0) or (row % 2 != 0 and column % 2 != 0):
-                    pygame.draw.rect(self.screen, WHITE, (x + (row * size), y + (column * size), size, size))
+                    pygame.draw.rect(self.screen, white, (x + (row * size), y + (column * size), size, size))
                 if row % 2 != 0 and column % 2 == 0 or (row % 2 == 0 and column % 2 != 0):
-                    block = pygame.draw.rect(self.screen, BLACK, (x + (row * size), y + (column * size), size, size))
+                    block = pygame.draw.rect(self.screen, black, (x + (row * size), y + (column * size), size, size))
                     self.pawn_display(str(self.grid.board[column][row]), block.center)
 
     def pawn_display(self, pawn, center):
